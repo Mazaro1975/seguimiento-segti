@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite no soporta enums nativos en Prisma: los valores controlados
+// (TipoBpOpr, Clasificacion, Estado, TipoSolicitud, Trimestre) se
+// modelan como String y se validan/tipan en la capa de aplicación
+// (ver src/lib/types.ts). Los valores válidos están documentados ahí.
+
+model Direction {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  slug        String       @unique
+  order       Int          @default(0)
+  initiatives Initiative[]
+}
+
+model Initiative {
+  id              String        @id @default(cuid())
+  legacyNumber    Int?
+  title           String
+  tipoBpOpr       String?
+  clasificacion   String        @default("SIN_CLASIFICAR")
+  estado          String        @default("SIN_ESTADO")
+  esfuerzo        Int?
+  prioridad       Int?
+  trimestre       String        @default("SIN_Q")
+  liderTI         String?
+  liderNegocio    String?
+  tipoSolicitud   String?
+  director        String?
+  businessPartner String?
+  directionId     String
+  direction       Direction     @relation(fields: [directionId], references: [id])
+  seguimientos    Seguimiento[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  archivedAt      DateTime?
+
+  @@index([directionId])
+  @@index([estado])
+  @@index([trimestre])
+  @@index([clasificacion])
+}
+
+model Seguimiento {
+  id           String     @id @default(cuid())
+  initiativeId String
+  initiative   Initiative @relation(fields: [initiativeId], references: [id], onDelete: Cascade)
+  fecha        DateTime
+  autor        String?
+  texto        String
+  createdAt    DateTime   @default(now())
+
+  @@index([initiativeId])
+  @@index([fecha])
+}
