@@ -18,6 +18,10 @@
 /Planeacion_Estrategica_2026_SEGTI_v2JMG.xlsx
 /docs/import-warnings.txt
 
+# paquetes instaladores privados (incluyen datos reales) — solo locales,
+# nunca deben subirse al repositorio público.
+*PRIVADO*.zip
+
 # misc
 .DS_Store
 *.pem
